@@ -84,6 +84,7 @@
                         </div>
                         <div class="form-group">
                             <button class="btn btn-primary" type="button" id="addUser">添加</button>
+                            <button class="btn btn-primary" type="button" id="editUser" style="display:none">修改</button>
                         </div>
                     </form>
                 </div>
@@ -166,8 +167,8 @@
             <td>{{$value.nickName}}</td>
             <td>{{$value.status == 1 ? "激活" : "未激活"}}</td>
             <td>{{$value.role == "admin" ? "管理员" : "普通用户"}}</td>
-            <td class="text-center">
-                <a href="javascript:;" class="btn btn-default btn-xs">编辑</a>
+            <td class="text-center" data-id="{{$value._id}}">
+                <a href="javascript:;" class="btn btn-default btn-xs edit">编辑</a>
                 <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
             </td>
         </tr>
@@ -235,6 +236,68 @@
                 }
             })
         });
+
+        // 编辑
+        var id;
+        $("tbody").on("click", ".edit", function() {
+            id = $(this).parent().attr("data-id");
+            $("form > h2").text("修改用户");
+            var trObj = $(this).parents("tr");
+            $("#email").val(trObj.children().eq(2).text());
+            $("#nickName").val(trObj.children().eq(3).text());
+            var status = trObj.children().eq(4).text();
+            var role = trObj.children().eq(5).text();
+            var imgScr = trObj.children().eq(1).find("img").attr("scr");
+            if (imgScr) {
+                $("#preview").attr("src", imgScr);
+                $("#img").val(imgScr);
+            } else {
+                $("preview").attr("src", "../assets/img/default.png");
+                $("#img").val("");
+            }
+
+            if (status == "激活") {
+                $("#jh").prop("checked", true);
+            } else {
+                $("#wjh").prop("checked", true);
+            }
+
+            if (role == "超级管理员") {
+                $("admin").prop("checked", true);
+            } else {
+                $("#normal").prop("checked", true);
+            }
+
+            $("#addUser").hide();
+            $("#editUser").show();
+        });
+
+        // 给修改按钮注册点击事件
+        $("#editUser").on("click", function() {
+            var formData = $("form").serialize();
+            $.ajax({
+                type: "put",
+                url: "/users/" + id,
+                data: formData,
+                success: function(res) {
+                    var index = taskAry.findIndex(item => item._id == res._id);
+                    taskAry[index] = res;
+                    render(taskAry);
+                    $("#addUser").hide();
+                    $("#editUser").show();
+                    $("form > h2").text("添加新用户");
+                    $("#img").val("");
+                    $("#preview").attr("src", "../assets/img/default.png");
+                    $("#email").val("");
+                    $("#nickName").val("");
+                    $("#password").val("");
+                    $("#admin").prop("checked", false);
+                    $("#normal").prop("checked", true);
+                    $("#wjh").prop("checked", true);
+                    $("#jh").prop("checked", false);
+                }
+            })
+        })
     </script>
 </body>
 
