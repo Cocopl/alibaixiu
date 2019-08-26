@@ -231,8 +231,11 @@
                 processData: false,
                 contentType: false,
                 success: function(res) {
-                    $("#img").val(res[0].avatar);
-                    $("#preview").attr("src", res[0].avatar);
+                    if (res[0]) {
+                        $("#img").val(res[0].avatar);
+                        $("#preview").attr("src", res[0].avatar);
+                    }
+
                 }
             })
         });
@@ -247,7 +250,7 @@
             $("#nickName").val(trObj.children().eq(3).text());
             var status = trObj.children().eq(4).text();
             var role = trObj.children().eq(5).text();
-            var imgScr = trObj.children().eq(1).find("img").attr("scr");
+            var imgScr = trObj.children().eq(1).find("img").attr("src");
             if (imgScr) {
                 $("#preview").attr("src", imgScr);
                 $("#img").val(imgScr);
