@@ -46,42 +46,44 @@
                             <label>头像</label>
                             <div class="form-group">
                                 <label class="form-image">
-                  <input id="avatar" type="file">
-                  <img src="../assets/img/default.png">
-                  <i class="mask fa fa-upload"></i>
-                </label>
+                                  <input id="avatar" type="file">
+                                  <img src="../assets/img/default.png" id="preview">
+                                  <i class="mask fa fa-upload"></i>
+                                </label>
+                                <!-- 隐藏域 -->
+                                <input type="hidden" name="avatar" id="img">
                             </div>
                         </div>
                         <div class="form-group">
                             <label>邮箱</label>
-                            <input class="form-control" type="email" placeholder="请输入邮箱">
+                            <input class="form-control" name="email" type="email" placeholder="请输入邮箱">
                         </div>
                         <div class="form-group">
                             <label>昵称</label>
-                            <input class="form-control" type="text" placeholder="请输入昵称">
+                            <input class="form-control" name="nickName" type="text" placeholder="请输入昵称">
                         </div>
                         <div class="form-group">
                             <label>密码</label>
-                            <input class="form-control" type="text" placeholder="请输入密码">
+                            <input class="form-control" type="text" placeholder="请输入密码" name="password">
                         </div>
                         <div class="form-group">
                             <div class="radio-inline">
-                                <label><input type="radio">未激活</label>
+                                <label><input type="radio" name="status" value="0">未激活</label>
                             </div>
                             <div class="radio-inline">
-                                <label><input type="radio">激活</label>
+                                <label><input type="radio" name="status" value="1">激活</label>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="radio-inline">
-                                <label><input type="radio">超级管理员</label>
+                                <label><input type="radio" name="role" value="admin">超级管理员</label>
                             </div>
                             <div class="radio-inline">
-                                <label><input type="radio">普通用户</label>
+                                <label><input type="radio" name="role" value="normal">普通用户</label>
                             </div>
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-primary" type="submit">添加</button>
+                            <button class="btn btn-primary" type="button" id="addUser">添加</button>
                         </div>
                     </form>
                 </div>
@@ -159,7 +161,7 @@
         {{each list}}
         <tr>
             <td class="text-center"><input type="checkbox"></td>
-            <td class="text-center"><img class="avatar" src="../assets/img/default.png"></td>
+            <td class="text-center"><img class="avatar" src="{{$value.avatar}}"></td>
             <td>{{$value.email}}</td>
             <td>{{$value.nickName}}</td>
             <td>{{$value.status == 1 ? "激活" : "未激活"}}</td>
@@ -189,6 +191,41 @@
             })
             $("#task").html(html);
         }
+
+        // 用户添加功能
+        $("#addUser").on("click", function() {
+            let formData = $("form").serialize();
+            console.log(formData);
+            $.ajax({
+                type: "post",
+                url: "/users",
+                data: formData,
+                success: function(res) {
+                    console.log(res);
+                    taskAry.push(res);
+                    render(taskAry);
+                }
+            })
+        });
+
+        // 图片文件上传功能
+        $("#avatar").on("change", function() {
+            var formDate = new FormData();
+            formDate.append("avatar", this.files[0]);
+            // console.log(this.files[0]);
+            // console.log(formDate);
+            $.ajax({
+                type: "post",
+                url: "/upload",
+                data: formDate,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    $("#img").val(res[0].avatar);
+                    $("#preview").attr("src", res[0].avatar);
+                }
+            })
+        })
     </script>
 </body>
 
