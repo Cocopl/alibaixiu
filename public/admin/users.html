@@ -56,30 +56,30 @@
                         </div>
                         <div class="form-group">
                             <label>邮箱</label>
-                            <input class="form-control" name="email" type="email" placeholder="请输入邮箱">
+                            <input class="form-control" name="email" type="email" placeholder="请输入邮箱" id="email">
                         </div>
                         <div class="form-group">
                             <label>昵称</label>
-                            <input class="form-control" name="nickName" type="text" placeholder="请输入昵称">
+                            <input class="form-control" name="nickName" type="text" placeholder="请输入昵称" id="nickName">
                         </div>
                         <div class="form-group">
                             <label>密码</label>
-                            <input class="form-control" type="text" placeholder="请输入密码" name="password">
+                            <input class="form-control" type="password" placeholder="请输入密码" name="password" id="password">
                         </div>
                         <div class="form-group">
                             <div class="radio-inline">
-                                <label><input type="radio" name="status" value="0">未激活</label>
+                                <label><input type="radio" name="status" value="0" id="wjh" checked>未激活</label>
                             </div>
                             <div class="radio-inline">
-                                <label><input type="radio" name="status" value="1">激活</label>
+                                <label><input type="radio" name="status" value="1" id="jh">激活</label>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="radio-inline">
-                                <label><input type="radio" name="role" value="admin">超级管理员</label>
+                                <label><input type="radio" name="role" value="admin" id="admin">超级管理员</label>
                             </div>
                             <div class="radio-inline">
-                                <label><input type="radio" name="role" value="normal">普通用户</label>
+                                <label><input type="radio" name="role" value="normal" id="normal" checked>普通用户</label>
                             </div>
                         </div>
                         <div class="form-group">
@@ -201,9 +201,18 @@
                 url: "/users",
                 data: formData,
                 success: function(res) {
-                    console.log(res);
+                    // console.log(res);
                     taskAry.push(res);
                     render(taskAry);
+                    $("#img").val("");
+                    $("#preview").attr("src", "../assets/img/default.png");
+                    $("#email").val("");
+                    $("#nickName").val("");
+                    $("#password").val("");
+                    $("#admin").prop("checked", false);
+                    $("#normal").prop("checked", true);
+                    $("#wjh").prop("checked", true);
+                    $("#jh").prop("checked", false);
                 }
             })
         });
@@ -225,7 +234,7 @@
                     $("#preview").attr("src", res[0].avatar);
                 }
             })
-        })
+        });
     </script>
 </body>
 
