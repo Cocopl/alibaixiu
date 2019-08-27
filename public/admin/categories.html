@@ -44,14 +44,15 @@
                         <h2>添加分类</h2>
                         <div class="form-group">
                             <label>名称</label>
-                            <input class="form-control" name="title" type="text" placeholder="请输入分类名称">
+                            <input class="form-control" name="title" type="text" placeholder="请输入分类名称" id="title">
                         </div>
                         <div class="form-group">
                             <label>图标</label>
-                            <input class="form-control" name="className" type="text" placeholder="请输入分类图标类名">
+                            <input class="form-control" name="className" type="text" placeholder="请输入分类图标类名" id="ico">
                         </div>
                         <div class="form-group">
-                            <button class="btn btn-primary" type="submit">添加</button>
+                            <button class="btn btn-primary" type="button" id="btnAdd">添加</button>
+                            <button class="btn btn-primary" type="button" id="btnEdit" style="display:none">修改</button>
                         </div>
                     </form>
                 </div>
@@ -68,8 +69,8 @@
                                 <th class="text-center" width="100">操作</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
+                        <tbody class="data">
+                            <!-- <tr>
                                 <td class="text-center"><input type="checkbox"></td>
                                 <td>奇趣事</td>
                                 <td>fg-class</td>
@@ -93,7 +94,7 @@
                                     <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
                                     <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
                                 </td>
-                            </tr>
+                            </tr> -->
                         </tbody>
                     </table>
                 </div>
@@ -139,6 +140,7 @@
     </div>
     <script src="../assets/vendors/jquery/jquery.js"></script>
     <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
+    <script src="../assets/vendors/art-template/template-web.js"></script>
     <script>
         NProgress.done()
     </script>
@@ -147,21 +149,78 @@
         {{each list}}
         <tr>
             <td class="text-center"><input type="checkbox"></td>
-            <td>奇趣事</td>
-            <td>fg-class</td>
-            <td class="text-center">
-                <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
-                <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
+            <td>{{$value.title}}</td>
+            <td>{{$value.className}}</td>
+            <td class="text-center" data-id="{{$value._id}}">
+                <a href="javascript:;" class="btn btn-info btn-xs edit">编辑</a>
+                <a href="javascript:;" class="btn btn-danger btn-xs delete">删除</a>
             </td>
         </tr>
         {{/each}}
     </script>
     <script>
-        // 完成分类显示功能
-
-
-
+        var cateAry = [];
         // 完成添加功能
+        $("#btnAdd").on("click", function() {
+            var formDate = $("form").serialize();
+            // console.log(formDate);
+            $.ajax({
+                type: "post",
+                url: "/categories",
+                data: formDate,
+                success: function(res) {
+                    cateAry.push(res);
+                    render(cateAry);
+                    $("#title").val("");
+                    $("#ico").val("");
+                    // console.log(res);
+                }
+            })
+        })
+
+        // 完成分类显示功能
+        $.ajax({
+            type: "get",
+            url: "/categories",
+            success: function(res) {
+                cateAry = res;
+                render(cateAry);
+                console.log(res);
+            }
+        });
+
+        function render(cateAr) {
+            var html = template("cateTpl", {
+                list: cateAr
+            });
+            $(".data").html(html);
+        }
+
+        // 修改功能
+        $(".data").on("click", ".edit", function() {
+            var id = $(this).parent().attr("data-id");
+            var title = $(this).parents("tr").children().eq(1).text();
+            var className = $(this).parents("tr").children().eq(2).text();
+            $("#title").val(title);
+            $("#ico").val(className);
+            $("#btnAdd").hide();
+            $("#btnEdit").show();
+        });
+        $("#btnEdit").on("click", function() {
+            var formDate = $("form").serialize();
+            // console.log(formDate);
+            var id = $(this).parent().attr("data-id");
+            $.ajax({
+                type: "put",
+                url: "/categories/" + id,
+                data: formDate,
+                success: function(res) {
+                    var index = cateAry.findIndex(item => item._id == res._id);
+                    cateAry[index] = res;
+                    render(cateAry);
+                }
+            })
+        })
     </script>
 </body>
 
