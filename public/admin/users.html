@@ -161,12 +161,12 @@
     <script type="text/html" id="taskTpl">
         {{each list}}
         <tr>
-            <td class="text-center"><input type="checkbox"></td>
-            <td class="text-center"><img class="avatar" src="{{$value.avatar}}"></td>
+            <td class="text-center"><input type="checkbox" data-id="{{$value._id}}"></td>
+            <td class="text-center"><img class="avatar" src="{{$value.avatar}} "></td>
             <td>{{$value.email}}</td>
             <td>{{$value.nickName}}</td>
-            <td>{{$value.status == 1 ? "激活" : "未激活"}}</td>
-            <td>{{$value.role == "admin" ? "管理员" : "普通用户"}}</td>
+            <td>{{$value.status == 1 ? "激活 " : "未激活 "}}</td>
+            <td>{{$value.role == "admin " ? "管理员 " : "普通用户 "}}</td>
             <td class="text-center" data-id="{{$value._id}}">
                 <a href="javascript:;" class="btn btn-default btn-xs edit">编辑</a>
                 <a href="javascript:;" class="btn btn-danger btn-xs delete">删除</a>
@@ -220,21 +220,21 @@
         });
 
         // 图片文件上传功能
-        $("#avatar").on("change", function() {
+        $("#avatar ").on("change ", function() {
             var formDate = new FormData();
-            formDate.append("avatar", this.files[0]);
+            formDate.append("avatar ", this.files[0]);
             // console.log(this.files[0]);
             // console.log(formDate);
             $.ajax({
-                type: "post",
-                url: "/upload",
+                type: "post ",
+                url: "/upload ",
                 data: formDate,
                 processData: false,
                 contentType: false,
                 success: function(res) {
                     if (res[0]) {
-                        $("#img").val(res[0].avatar);
-                        $("#preview").attr("src", res[0].avatar);
+                        $("#img ").val(res[0].avatar);
+                        $("#preview ").attr("src ", res[0].avatar);
                     }
                 }
             })
@@ -242,9 +242,9 @@
 
         // 编辑
         var id;
-        $("tbody").on("click", ".edit", function() {
-            id = $(this).parent().attr("data-id");
-            $("form > h2").text("修改用户");
+        $("tbody ").on("click ", ".edit ", function() {
+            id = $(this).parent().attr("data-id ");
+            $("form> h2").text("修改用户");
             var trObj = $(this).parents("tr");
             $("#email").val(trObj.children().eq(2).text());
             $("#nickName").val(trObj.children().eq(3).text());
@@ -258,24 +258,20 @@
                 $("preview").attr("src", "../assets/img/default.png");
                 $("#img").val("");
             }
-
             if (status == "激活") {
                 $("#jh").prop("checked", true);
             } else {
                 $("#wjh").prop("checked", true);
             }
-
             if (role == "超级管理员") {
                 $("#admin").prop("checked", true);
             } else {
                 $("#normal").prop("checked", true);
             }
-
             $("#addUser").hide();
             $("#editUser").show();
         });
-
-        // 给修改按钮注册点击事件
+        // 给修改按钮注册点击事件 
         $("#editUser").on("click", function() {
             var formData = $("form").serialize();
             $.ajax({
@@ -302,7 +298,8 @@
             })
         });
 
-        // 删除单个用户
+        // 删除单个用户 
+
         $("tbody").on("click", ".delete", function() {
             if (confirm("您确定要删除吗?")) {
                 id = $(this).parent().attr("data-id");
@@ -317,8 +314,7 @@
                 })
             }
         });
-
-        // 实现全选功能
+        // 实现全选功能 
         $("#checkAll").on("click", function() {
             var flag = $(this).prop("checked");
             $("tbody input[type='checkbox']").prop("checked", flag);
@@ -329,19 +325,49 @@
             }
         });
         $("tbody").on("click", "input[type='checkbox']", function() {
+            // 获取所有checkbox的数量
             var allLength = $("tbody input[type='checkbox']").length;
+            // 获得已经选中的checkbox的数量 
             var checkLength = $("tbody input[type='checkbox']:checked").length;
-            // console.log(checkLength);
+            // console.log(checkLength); 
+            // 当两个相等的时候checkall被选中 
             if (allLength == checkLength) {
                 $("#checkAll").prop("checked", true);
             } else {
                 $("#checkAll").prop("checked", false);
             }
-            if (checkLength > 3) {
+
+            // 当被选中的数量大于三的时候批量删除按钮显示 
+
+            if (checkLength > 1) {
                 $("#all").show();
             } else {
                 $("#all").hide();
             }
+        });
+
+        // 批量删除
+
+        $("#all").on("click", function() {
+            var Userdel = $("tbody input:checked");
+            var delAry = [];
+            // console.log(USerdel);
+            Userdel.each(function(index, item) {
+                    delAry.push($(item).attr("data-id"));
+
+                })
+                // console.log(delAry);
+            $.ajax({
+                type: "delete",
+                url: "/users/" + delAry.join("-"),
+                success: function(res) {
+                    res.forEach(value => {
+                        var index = taskAry.findIndex(item => item._id == value._id);
+                        taskAry.splice(index, 1);
+                        render(taskAry);
+                    })
+                }
+            })
         })
     </script>
 </body>
