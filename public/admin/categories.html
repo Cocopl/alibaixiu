@@ -57,13 +57,13 @@
                     </form>
                 </div>
                 <div class="col-md-8">
-                    <!-- <div class="page-action">
-            <a class="btn btn-danger btn-sm" href="javascript:;">批量删除</a>
-          </div> -->
+                    <div class="page-action" style="display:none">
+                        <a class="btn btn-danger btn-sm" href="javascript:;" id="del_all">批量删除</a>
+                    </div>
                     <table class="table table-striped table-bordered table-hover">
                         <thead>
                             <tr>
-                                <th class="text-center" width="40"><input type="checkbox"></th>
+                                <th class="text-center" width="40"><input type="checkbox" id="checkall"></th>
                                 <th>名称</th>
                                 <th>分类名称</th>
                                 <th class="text-center" width="100">操作</th>
@@ -148,7 +148,7 @@
     <script type="text/html" id="cateTpl">
         {{each list}}
         <tr>
-            <td class="text-center"><input type="checkbox"></td>
+            <td class="text-center"><input type="checkbox" data-id="{{$value._id}}"></td>
             <td>{{$value.title}}</td>
             <td>{{$value.className}}</td>
             <td class="text-center" data-id="{{$value._id}}">
@@ -197,8 +197,10 @@
         }
 
         // 修改功能
+        var id;
         $(".data").on("click", ".edit", function() {
-            var id = $(this).parent().attr("data-id");
+            id = $(this).parent().attr("data-id");
+            console.log(id);
             var title = $(this).parents("tr").children().eq(1).text();
             var className = $(this).parents("tr").children().eq(2).text();
             $("#title").val(title);
@@ -209,7 +211,8 @@
         $("#btnEdit").on("click", function() {
             var formDate = $("form").serialize();
             // console.log(formDate);
-            var id = $(this).parent().attr("data-id");
+            // var id = $(this).parent().attr("data-id");
+            // console.log(id);
             $.ajax({
                 type: "put",
                 url: "/categories/" + id,
@@ -218,6 +221,75 @@
                     var index = cateAry.findIndex(item => item._id == res._id);
                     cateAry[index] = res;
                     render(cateAry);
+                }
+            })
+        });
+
+        // 删除功能
+        // 单个删除
+        $("tbody").on("click", ".delete", function() {
+            if (confirm("你确定要删除？")) {
+                var id = $(this).parent().attr("data-id");
+                // console.log(id);
+                $.ajax({
+                    type: "delete",
+                    url: "/categories/" + id,
+                    success: function(res) {
+                        var index = cateAry.findIndex(item => item._id == res._id);
+                        cateAry.splice(index, 1);
+                        render(cateAry);
+                    }
+                })
+            }
+        });
+
+        // 1.全选
+        $("#checkall").on("click", function() {
+            var status = $(this).prop("checked");
+            // console.log(status);
+            $("tbody input[type='checkbox']").prop("checked", status);
+            if (status) {
+                $(".page-action").show();
+            } else {
+                $(".page-action").hide();
+            }
+        });
+        $("tbody").on("click", "input[type='checkbox']", function() {
+            var checkallL = $("tbody input[type='checkbox']").length;
+            var checkL = $("tbody input[type='checkbox']:checked").length;
+            // console.log(checkL);
+            if (checkallL == checkL) {
+                $("#checkall").prop("checked", true);
+            } else {
+                $("#checkall").prop("checked", false);
+            }
+            if (checkL > 1) {
+                $(".page-action").show();
+            } else {
+                $(".page-action").hide();
+            }
+        });
+
+        // 批量删除
+        $("#del_all").on("click", function() {
+            var Userdel = $("tbody input:checked");
+            // console.log(Userdel);
+            var delAry = [];
+            Userdel.each(function(index, item) {
+                delAry.push($(item).attr("data-id"));
+            });
+            console.log(delAry);
+            $.ajax({
+                type: "delete",
+                url: "/categories/" + delAry.join("-"),
+                success: function(res) {
+                    console.log(res);
+                    res.forEach(value => {
+                        var index = cateAry.findIndex(item => item._id == value._id);
+                        cateAry.splice(index, 1);
+                        render(cateAry);
+                    })
+
                 }
             })
         })
