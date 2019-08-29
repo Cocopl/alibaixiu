@@ -53,8 +53,8 @@
                     <div class="form-group">
                         <label for="feature">特色图像</label>
                         <!-- show when image chose -->
-                        <img class="help-block thumbnail" style="display: none">
-                        <input id="feature" class="form-control" name="feature" type="file" id="preview">
+                        <img class="help-block thumbnail" style="display: none" id="preview">
+                        <input class="form-control" name="feature" type="file" id="feature">
                         <!-- 隐藏域 -->
                         <input type="hidden" id="img" name="avatar">
                     </div>
@@ -78,6 +78,7 @@
                     </div>
                     <div class="form-group">
                         <button class="btn btn-primary" type="button" id="pAdd">保存</button>
+                        <button class="btn btn-primary" type="button" id="pEdit" style="display:none">修改</button>
                     </div>
                 </div>
             </form>
@@ -145,9 +146,11 @@
                 processData: false,
                 contentType: false,
                 success: function(res) {
+                    // console.log(res);
                     if (res[0]) {
-                        $("#preview").attr("src", res[0].avatar);
+                        $("#preview").show().attr("src", res[0].avatar);
                         $("#img").val(res[0].avatar);
+                        // console.log($("#preview").attr("src"));
                     }
                 }
             })
@@ -162,6 +165,7 @@
                     list: res
                 });
                 $("#category").html(str);
+
             }
         });
 
@@ -174,11 +178,67 @@
                 url: "/posts",
                 data: formData,
                 success: function(res) {
-                    console.log(res);
+                    // console.log(res);
                     location.href = "posts.html";
                 }
             })
+        });
+
+        // 修改文章
+        var id = getUrl("id");
+        if (id != -1) {
+            $.ajax({
+                type: "get",
+                url: "/posts/" + id,
+                success: function(res) {
+                    console.log(res);
+                    $("#title").val(res.title);
+                    $("#content").val(res.content);
+                    $("h1").text("修改文章");
+                    $("#preview").attr("src", res.thumbnail);
+                    $("#img").val(res.thumbnail);
+                    $("#category > option").each((index, item) => {
+                        if ($(item).attr("value") == res.category) {
+                            $(item).prop("selected", true);
+                        }
+                    })
+                    $("#status > option").each((index, item) => {
+                        if ($(item).attr("value") == res.state) {
+                            $(item).prop("selected", true);
+                        }
+                    })
+
+                    $("#created").val(res.createAt && res.createAt.substr(0, 16));
+                    $("#pAdd").hide();
+                    $("#pEdit").show();
+                }
+            })
+        }
+
+        $("#pEdit").on("click", function() {
+            $.ajax({
+                type: "put",
+                url: "/posts/" + id,
+                data: $("form").serialize(),
+                success: function(res) {
+                    // console.log(res);
+                    location.href = "posts.html"
+                }
+            })
         })
+
+        function getUrl(name) {
+            var paramsAry = location.search.substr(1).split("&");
+            for (var i = 0; i < paramsAry.length; i++) {
+                var temp = paramsAry[i].split("=");
+                // console.log(temp);
+                if (temp[0] == name) {
+                    return temp[1];
+                }
+            }
+            return -1;
+        }
+        // console.log(id);
     </script>
 </body>
 
