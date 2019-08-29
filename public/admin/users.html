@@ -220,21 +220,21 @@
         });
 
         // 图片文件上传功能
-        $("#avatar ").on("change ", function() {
+        $("#avatar").on("change", function() {
             var formDate = new FormData();
-            formDate.append("avatar ", this.files[0]);
+            formDate.append("avatar", this.files[0]);
             // console.log(this.files[0]);
             // console.log(formDate);
             $.ajax({
-                type: "post ",
-                url: "/upload ",
+                type: "post",
+                url: "/upload",
                 data: formDate,
                 processData: false,
                 contentType: false,
                 success: function(res) {
                     if (res[0]) {
-                        $("#img ").val(res[0].avatar);
-                        $("#preview ").attr("src ", res[0].avatar);
+                        $("#img").val(res[0].avatar);
+                        $("#preview").attr("src ", res[0].avatar);
                     }
                 }
             })
@@ -353,10 +353,11 @@
             var delAry = [];
             // console.log(USerdel);
             Userdel.each(function(index, item) {
-                    delAry.push($(item).attr("data-id"));
+                delAry.push($(item).attr("data-id"));
+            })
 
-                })
-                // console.log(delAry);
+            // console.log(delAry);
+
             $.ajax({
                 type: "delete",
                 url: "/users/" + delAry.join("-"),
