@@ -194,6 +194,28 @@
             // console.log(state);
             render(category, state);
         });
+
+        // 删除文章
+        $("#write").on("click", ".delete", function() {
+            var id = $(this).parent().attr("data-id");
+            if (confirm("您真的要删除它吗？")) {
+                $.ajax({
+                    type: "delete",
+                    url: "/posts/" + id,
+                    success: function(res) {
+                        if ($("tbody").children().length == 1) {
+                            if (window.page == 1) {
+                                render(category, state, window.page);
+                            } else {
+                                render(category, state, window.page - 1);
+                            }
+                        } else {
+                            render(category, state, window.page);
+                        }
+                    }
+                })
+            }
+        })
     </script>
 </body>
 
