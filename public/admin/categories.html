@@ -203,6 +203,7 @@
             console.log(id);
             var title = $(this).parents("tr").children().eq(1).text();
             var className = $(this).parents("tr").children().eq(2).text();
+            $("h2").text("修改分类");
             $("#title").val(title);
             $("#ico").val(className);
             $("#btnAdd").hide();
@@ -221,6 +222,11 @@
                     var index = cateAry.findIndex(item => item._id == res._id);
                     cateAry[index] = res;
                     render(cateAry);
+                    $("h2").text("添加分类");
+                    $("#title").val("");
+                    $("#ico").val("");
+                    $("#btnAdd").show();
+                    $("#btnEdit").hide();
                 }
             })
         });
