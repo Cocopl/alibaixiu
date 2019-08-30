@@ -60,3 +60,8 @@ $.ajax({
         $(".navBox").html(htmlNav);
     }
 })
+
+$(".btn").on("click", function() {
+    var key = $(".keys").val();
+    location.href = "/search.html?key=" + key;
+})
