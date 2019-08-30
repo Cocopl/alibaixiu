@@ -56,7 +56,7 @@
                         <img class="help-block thumbnail" style="display: none" id="preview">
                         <input class="form-control" name="feature" type="file" id="feature">
                         <!-- 隐藏域 -->
-                        <input type="hidden" id="img" name="avatar">
+                        <input type="hidden" id="img" name="thumbnail">
                     </div>
                     <div class="form-group">
                         <label for="category">所属分类</label>
@@ -197,6 +197,7 @@
                     $("h1").text("修改文章");
                     $("#preview").attr("src", res.thumbnail);
                     $("#img").val(res.thumbnail);
+                    console.log(res.thumbnail);
                     $("#category > option").each((index, item) => {
                         if ($(item).attr("value") == res.category) {
                             $(item).prop("selected", true);

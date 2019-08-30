@@ -158,6 +158,7 @@
                     state
                 },
                 success: function(res) {
+                    console.log(res);
                     window.page = res.page;
                     var html = template("postTpl", res);
                     $("#write").html(html);
@@ -179,6 +180,7 @@
             type: "get",
             url: "/categories",
             success: function(res) {
+                // console.log(res);
                 var cates = template("cateTpl", {
                     list: res
                 });
