@@ -35,12 +35,8 @@
                 <h1>所有评论</h1>
             </div>
             <div class="page-action">
-                <ul class="pagination pagination-sm pull-right">
-                    <li><a href="#">上一页</a></li>
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">下一页</a></li>
+                <ul class="pagination pagination-sm pull-right" id="page_act">
+
                 </ul>
             </div>
             <table class="table table-striped table-bordered table-hover">
@@ -54,7 +50,7 @@
                         <th class="text-center" width="100">操作</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="comm">
                     <tr class="danger">
                         <td>大大</td>
                         <td>楼主好人，顶一个</td>
@@ -73,7 +69,7 @@
                         <td>2026/10/07</td>
                         <td>已批准</td>
                         <td class="text-center">
-                            <a href="post-add.html" class="btn btn-warning btn-xs">驳回</a>
+                            <a href="javascript:;" class="btn btn-warning btn-xs">驳回</a>
                             <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
                         </td>
                     </tr>
@@ -84,7 +80,7 @@
                         <td>2026/10/07</td>
                         <td>已批准</td>
                         <td class="text-center">
-                            <a href="post-add.html" class="btn btn-warning btn-xs">驳回</a>
+                            <a href="javascript:;" class="btn btn-warning btn-xs">驳回</a>
                             <a href="javascript:;" class="btn btn-danger btn-xs">删除</a>
                         </td>
                     </tr>
@@ -132,10 +128,116 @@
 
     <script src="../assets/vendors/jquery/jquery.js"></script>
     <script src="../assets/vendors/bootstrap/js/bootstrap.js"></script>
+    <script src="../assets/vendors/art-template/template-web.js"></script>
     <script>
         NProgress.done()
     </script>
     <script src="../assets/js/common.js"></script>
+    <script type="text/html" id="comTpl">
+        {{each records}}
+        <tr>
+            <td>{{$value.author.nickName}}</td>
+            <td>{{$value.content}}</td>
+            <td>{{$value.post.title}}</td>
+            <td>{{$value.createAt.substr(0,16)}}</td>
+            <td>{{$value.state == 0 ? "未审核" : "已批准"}}</td>
+            <td class="text-center" data-id="{{$value._id}}">
+                <a href="javascript:;" class="btn btn-warning btn-xs edit" data-status="{{$value.state}}">{{$value.state == 0 ? "批准" : "驳回"}}</a>
+                <a href="javascript:;" class="btn btn-danger btn-xs delete">删除</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
+    <script type="text/html" id="pageTpl">
+        {{if page > 1}}
+        <li><a href="javascript:;" onclick="changePage({{page - 1}})">上一页</a></li>
+        {{/if}} {{each display}}
+        <li class="{{$value == page ? active : ''}}"><a href="javascript:;" onclick="changePage({{$value}})">{{$value}}</a></li>
+        {{/each}} {{if pages > page}}
+        <li><a href="javascript:;" onclick="changePage({{page - 0 + 1}})">下一页</a></li>
+        {{/if}}
+    </script>
+    <script>
+        function render(page = 1) {
+            $.ajax({
+                type: "get",
+                url: "/comments",
+                data: {
+                    page,
+                },
+                success: function(res) {
+                    console.log(res);
+                    window.page = res.page;
+                    var html = template("comTpl", res);
+                    $("#comm").html(html);
+                    // console.log(res);
+                    var pagehtml = template("pageTpl", res);
+                    $("#page_act").html(pagehtml);
+                    // console.log(res);
+                }
+            })
+        }
+        render();
+
+        function changePage(index) {
+            render(index);
+        }
+        // 更改评论状态
+        $("#comm").on("click", ".edit", function() {
+            var id = $(this).parent().attr("data-id");
+            var status = $(this).attr("data-status");
+            $.ajax({
+                type: "put",
+                url: "/comments/" + id,
+                data: {
+                    state: status == 0 ? 1 : 0
+                },
+                success: function(res) {
+                    render();
+
+                }
+            })
+        });
+
+        function changePage(page) {
+            $.ajax({
+                type: "get",
+                url: "/comments",
+                data: {
+                    page: page
+                },
+                success: function(res) {
+                    var html = template("comTpl", res);
+                    $("#comm").html(html);
+                    var pagehtml = template("pageTpl", res);
+                    $("#page_act").html(pagehtml);
+                }
+            });
+        }
+
+        // 删除评论
+        $("#comm").on("click", ".delete", function() {
+
+            if (confirm("您真的要删除这个吗？")) {
+                var id = $(this).parent().attr("data-id");
+                $.ajax({
+                    type: "delete",
+                    url: "/comments/" + id,
+                    success: function() {
+                        if ($("tbody").children().length == 1) {
+                            if (window.page == 1) {
+                                render(window.page);
+                            } else {
+                                render(window.page - 1);
+                            }
+                        } else {
+                            render(window.page);
+                        }
+                    }
+                })
+            }
+        })
+    </script>
 </body>
 
 </html>
