@@ -1,3 +1,20 @@
+<script>
+    function getUrl(name) {
+        var paramsAry = location.search.substr(1).split("&");
+        for (var i = 0; i < paramsAry.length; i++) {
+            var temp = paramsAry[i].split("=");
+            // console.log(temp);
+            if (temp[0] == name) {
+                return temp[1];
+            }
+        }
+        return -1;
+    }
+    var cid = getUrl("id");
+    if (cid == -1) {
+        location.href = "index.html";
+    }
+</script>
 <!DOCTYPE html>
 <html lang="zh-CN">
 
@@ -255,12 +272,11 @@
     <script src="assets/vendors/jquery/jquery.min.js"></script>
     <script src="assets/vendors/art-template/template-web.js"></script>
     <script src="assets/js/public.js"></script>
-    <script type="text/html" id="writeTpl">
-        <h3>最新发布</h3>
+    <script type="text/html" id="listTpl">
+        <h3>{{data[0].category.title}}</h3>
         {{each data}}
         <div class="entry">
             <div class="head">
-                <span class="sort">{{$value.category.title}}</span>
                 <a href="detail.html?id={{$value._id}}">{{$value.title}}</a>
             </div>
             <div class="main">
@@ -285,12 +301,13 @@
         {{/each}}
     </script>
     <script>
+        // var id = getUrl(id);
         $.ajax({
             type: "get",
-            url: "/posts/lasted",
+            url: "/posts/category/" + cid,
             success: function(res) {
                 console.log(res);
-                var html = template("writeTpl", {
+                var html = template("listTpl", {
                     data: res
                 });
                 $("#new").html(html);
