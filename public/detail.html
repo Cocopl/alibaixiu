@@ -110,7 +110,7 @@
             <div class="widgets">
                 <h4>最新评论</h4>
                 <ul class="body discuz" id="comment">
-                    <li>
+                    <!-- <li>
                         <a href="javascript:;">
                             <div class="avatar">
                                 <img src="uploads/avatar_1.jpg" alt="">
@@ -135,7 +135,7 @@
                                 <p>挺会玩的</p>
                             </div>
                         </a>
-                    </li>
+                    </li> -->
                     <!-- <li>
                         <a href="javascript:;">
                             <div class="avatar">
@@ -192,7 +192,8 @@
             </div>
         </div>
         <div class="content">
-            <div class="article" id="main">
+            <div class="article" id="main"></div>
+            <div id="comm">
 
             </div>
             <div class="panel hots">
@@ -253,12 +254,43 @@
         </div>
         {{content}}
     </script>
+    <!-- 评论模板 -->
+    <script type="text/html" id="commentTpl">
+        <style type="text/css">
+            .comment {
+                margin-bottom: 20px;
+            }
+            
+            .comment textarea {
+                box-sizing: border-box;
+                padding: 10px;
+                width: 100%;
+                height: 80px;
+                display: block;
+            }
+            
+            .comment input {
+                width: 100px;
+                height: 30px;
+                margin-top: 10px;
+            }
+        </style>
+        <div class="comment">
+            <form>
+                <textarea></textarea>
+                <input type="submit" value="提交评论">
+            </form>
+        </div>
+    </script>
     <script>
+        var reviews;
+        var id;
         $.ajax({
             type: "get",
             url: "/posts/" + cid,
             success: function(res) {
                 // console.log(res);
+                id = res.author;
                 var htmlTpl = template("detailTpl",
                     res
                 );
@@ -275,6 +307,46 @@
                 }
             })
         });
+
+        $.ajax({
+            type: "get",
+            url: "/settings",
+            success: function(res) {
+                // console.log(res);
+                review = res.review;
+                if (res.comment) {
+                    var html = template("commentTpl");
+                    $("#comm").html(html);
+                }
+            }
+        });
+
+        $("#comm").on("submit", "form", function() {
+            var commValue = $(this).find("textarea").val();
+            var state;
+            if (review) {
+                state = 0;
+            } else {
+                state = 1;
+            }
+
+            $.ajax({
+                type: "get",
+                url: "/comments",
+                data: {
+                    author: cid,
+                    content: commValue,
+                    post: id
+                },
+                success: function() {
+                    alert("评论成功");
+                },
+                error: function() {
+                    alert("评论失败");
+                }
+            })
+            return false;
+        })
     </script>
 </body>
 
