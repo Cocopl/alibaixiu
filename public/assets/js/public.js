@@ -45,4 +45,18 @@ $.ajax({
         var htmlC = template.render(commTpl, { date: res });
         $("#comment").html(htmlC);
     }
+});
+
+$.ajax({
+    type: "get",
+    url: "/categories",
+    success: function(res) {
+        var navTpl = `
+			{{each date}}
+			<li><a href="list.html?id={{$value._id}}"><i class="fa {{$value.className}}"></i>{{$value.title}}</a></li>
+			{{/each}}
+		`;
+        var htmlNav = template.render(navTpl, { date: res });
+        $(".navBox").html(htmlNav);
+    }
 })
