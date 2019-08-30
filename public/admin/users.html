@@ -234,7 +234,7 @@
                 success: function(res) {
                     if (res[0]) {
                         $("#img").val(res[0].avatar);
-                        $("#preview").attr("src ", res[0].avatar);
+                        $("#preview").attr("src", res[0].avatar);
                     }
                 }
             })
@@ -242,8 +242,8 @@
 
         // 编辑
         var id;
-        $("tbody ").on("click ", ".edit ", function() {
-            id = $(this).parent().attr("data-id ");
+        $("tbody").on("click", ".edit", function() {
+            id = $(this).parent().attr("data-id");
             $("form> h2").text("修改用户");
             var trObj = $(this).parents("tr");
             $("#email").val(trObj.children().eq(2).text());
